@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@import url(https://fonts.googleapis.com/css?family=Barlow:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+@import url(https://fonts.googleapis.com/css?family=Wix+Madefor+Display:regular,500,600,700,800);
+
+* {
+  box-sizing: border-box;
+}
+
+@theme {
+  --color-primary : #f3f4ef;
+  --color-primary-dark : #e9eae3;
+  --color-secondary-dark: #7f1d1d;
+  --color-secondary-light: #8f2b2b;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold bg-secondary-dark text-white disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer hover:shadow-sm
+  }
+  .btn-danger {
+    @apply px-4 py-2 rounded-lg font-semibold bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer hover:shadow-sm
+  }
+  .btn-outline {
+    @apply px-4 py-2 rounded-lg font-semibold border border-slate-400 text-black disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer hover:shadow-sm
+  }
+  .input {
+    @apply border border-slate-300 shadow-sm px-2 py-1 md:py-2 md:px-4 w-full rounded-md focus:outline-none
+  }
+
+}
