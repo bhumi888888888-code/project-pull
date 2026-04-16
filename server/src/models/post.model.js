@@ -32,10 +32,11 @@ const postSchema = new mongoose.Schema({
     public_id: String,
     url: String,
   }],
-  likes: {
-    type: Number,
-    default: 0,
-  }
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }],
+  likesCount: {type: Number, default :0}
 }, {timestamps: true})
 
 postSchema.index({ user: 1, createdAt: -1 });

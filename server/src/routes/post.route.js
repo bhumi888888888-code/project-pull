@@ -1,8 +1,10 @@
 import express from "express";
 import { isAuthenticated } from "../middlewares/authMiddleware.js";
-import { createPost, deletePost, getPosts } from "../controllers/post.controller.js";
+import { createPost, deletePost, getPosts, likePost } from "../controllers/post.controller.js";
 
 const router = express.Router();
+
+router.use(isAuthenticated)
 
 router.post(
   "/create",
@@ -20,6 +22,12 @@ router.delete(
   "/delete/:id",
   isAuthenticated,
   deletePost,
+)
+
+router.put(
+  "/like",
+  isAuthenticated,
+  likePost,
 )
 
 export default router;

@@ -85,7 +85,20 @@ const userSchema = new mongoose.Schema(
         default: 0,
       },
     ],
-    posts: [postSchema],
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      }
+    ]
+    ,
+    likedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"Post",
+      }
+    ],
+    // posts: [postSchema],
     refreshTokens: [{ type: String }],
     tokenVersion: {
       type: Number,
@@ -94,6 +107,9 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.index({ likedPosts: 1})
+userSchema.index({ savedPosts: 1})
 
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;

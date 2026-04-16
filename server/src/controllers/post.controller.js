@@ -2,6 +2,7 @@ import cloudinary from "../config/cloudinary.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import ErrorHandler from "../middlewares/errorHandler.js";
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 
 // export const createPost = asyncHandler(async (req, res, next) => {
 //   const { text } = req.body;
@@ -153,7 +154,7 @@ export const createPost = asyncHandler(async (req, res, next) => {
 });
 
 export const getPosts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find().sort({ createdAt: -1 });
+  const posts = await Post.find().populate('user', 'name profilePic comments likes savedPosts').sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -188,5 +189,40 @@ export const deletePost = asyncHandler(async (req, res, next) => {
 
 })
 
+export const likePost = asyncHandler(async (req, res, next) => {
+  const { postId } = req.body;
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ErrorHandler("User not found",404))
+  }
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new ErrorHandler("Post not found",404))
+  }
+
+
+  const isLiked = post.likes.includes(userId);
+
+  const userUpdate = isLiked ? { $pull : {likedPosts: postId}} : {$addToSet: {likedPosts : postId}}
+
+  const postUpdate = isLiked ? { $pull: { likes: userId }, $inc: { likesCount: -1 } } :
+    { $addToSet: {likes: userId}, $inc: {likesCount: 1} }
+
+  const [updatedUser] = await Promise.all([
+    User.findByIdAndUpdate(userId, userUpdate , {new: true}).lean(),
+    Post.findByIdAndUpdate(postId, postUpdate , {new: true}).lean(),
+  ])
+
+  res.status(200).json({
+    success: true,
+    message: isLiked ? "Like removed" : "Post Liked",
+    isLiked: !isLiked,
+    likesCount: isLiked? post.likes.length - 1 : post.likes.length +1
+  })
+
+})
 
 //delete and get id should be in params else we can store it in the body

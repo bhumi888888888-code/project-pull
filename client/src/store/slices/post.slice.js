@@ -27,6 +27,17 @@ export const getPosts = createAsyncThunk("getPosts", async (_, thunkAPI) => {
   }
 })
 
+export const likePost = createAsyncThunk("likePost", async(postId, thunkAPI) => {
+ try {
+   const res = await axiosInstance.put("/post/like", postId);
+   toast.success(res?.data?.message)
+   return res?.data;
+ } catch (error) {
+  toast.error(error?.response?.data?.message || "Failed to like post")
+  return thunkAPI.rejectWithValue(error?.response?.data?.message)
+ }
+})
+
 export const deletePost = createAsyncThunk("deletePost", async (id, thunkAPI) => {
   try {
     const res = await axiosInstance.delete(`/post/delete/${id}`)
@@ -43,6 +54,8 @@ const postSlice = createSlice({
   initialState: {
     loading: false,
     posts: [],
+    isLiked: false,
+    likesCount: 0,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -76,7 +89,19 @@ const postSlice = createSlice({
       })
       .addCase(deletePost.rejected, (state) => {
         state.loading = false;
+      })
+      .addCase(likePost.pending, (state) => {
+        state.loading = true;
+      })
+    .addCase(likePost.fulfilled, (state, action)=> {
+      state.loading = false;
+      state.isLiked = action.payload.isLiked;
+      state.likesCount = action.payload.likesCount;
     })
+      .addCase(likePost.rejected, (state) => {
+        state.loading = false;
+    })
+
   }
 })
 
